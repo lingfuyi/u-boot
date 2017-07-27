@@ -1,8 +1,8 @@
-#u-boot-2016.05
-##修改功能：
+u-boot-2016.05
+修改功能：
 
-    - 在uboot-2016.05文件夹下vim脚本build.sh,用于编译uboot和分析
-    ```
+    在uboot-2016.05文件夹下vim脚本build.sh,用于编译uboot和分析
+
       make distclean
       make mini2440_defconfig
       make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi-
