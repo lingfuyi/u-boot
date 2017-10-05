@@ -1,1188 +1,1070 @@
-diff -urN u-boot-2016.05_release/arch/arm/cpu/arm920t/start.S u-boot-2016.05_base/arch/arm/cpu/arm920t/start.S
---- u-boot-2016.05_release/arch/arm/cpu/arm920t/start.S	2017-09-17 18:08:20.798081049 +0800
-+++ u-boot-2016.05_base/arch/arm/cpu/arm920t/start.S	2016-05-16 22:40:32.000000000 +0800
-@@ -50,7 +50,6 @@
+diff -urN u-boot-2016.05_base/arch/arm/cpu/arm920t/start.S u-boot-2016.05_release/arch/arm/cpu/arm920t/start.S
+--- u-boot-2016.05_base/arch/arm/cpu/arm920t/start.S	2016-05-16 22:40:32.000000000 +0800
++++ u-boot-2016.05_release/arch/arm/cpu/arm920t/start.S	2017-10-03 12:18:49.235702876 +0800
+@@ -50,6 +50,7 @@
  	bne	copyex
  #endif
  
--#if defined(CONFIG_SPL_BUILD)
++#if defined(CONFIG_SPL_BUILD)
  #ifdef CONFIG_S3C24X0
  	/* turn off the watchdog */
  
-@@ -79,73 +78,23 @@
+@@ -78,13 +79,66 @@
  	ldr	r1, =0x3ff
  	ldr	r0, =INTSUBMSK
  	str	r1, [r0]
--# elif defined(CONFIG_S3C2440)
--    ldr r1, =0x7fff
--    ldr r0, =INTSUBMSK
--    str r1, [r0]
++elif defined(CONFIG_S3C2440)  
++    ldr r1, =0x7fff  
++    ldr r0, =INTSUBMSK  
++    str r1, [r0]  
  # endif
  
--# if defined(CONFIG_S3C2440) 
--# define MPLLCON 0x4C000004 /* 系统主频配置寄存器 */
--# define UPLLCON 0x4C000008 /* USB频率配置寄存器 */
--# define CAMDIVN 0x4C000018 /* CAMERA时钟分频寄存器 */
--# define MMDIV_405 (0x7f<<12)
--# define MPSDIV_405 0x21
--# define UMDIV_48 (0x38<<12)
--# define UPSDIV_48 0X22
--
--	ldr r0, =CAMDIVN
--	mov r1, #0    
--	str r1, [r0]  
--
--    /* FCLK:HCLK:PCLK = 1:2:4 */
--    /* default FCLK is 120 MHz ! */
--    ldr r0, =CLKDIVN
--    mov r1, #0x05 
--    str r1, [r0]  
--
--    /* 如果HDIVN不等于0，CPU必须设置为异步总线模式 */
--    mrc p15, 0, r0, c1, c0, 0
--    orr r0, r0, #0xC0000000
--    mcr p15, 0, r0, c1, c0, 0
--
--    ldr r0, =UPLLCON
--    mov r1, #UMDIV_48 /* USB时钟48MHz */
--    add r1, r1, #UPSDIV_48
--    str r1, [r0] 
--    /*           
--     * When you set MPLL&UPLL values, you have to set the UPLL
--     * value first and then the MPLL value. (Needs intervals
--     * approximately 7 NOP)
--     */           
--    nop           
--    nop           
--    nop           
--    nop           
--    nop           
--    nop           
--    nop           
--    ldr r0, =MPLLCON
--    mov r1, #MMDIV_405 /* cpu时钟 400MHz */
--    add r1, r1, #MPSDIV_405
--    str r1, [r0]
--# else
--    /* FCLK:HCLK:PCLK = 1:2:4 */
--    /* default FCLK is 120 MHz ! */
--    ldr r0, =CLKDIVN
--    mov r1, #3
--    str r1, [r0]
--#endif
-+	/* FCLK:HCLK:PCLK = 1:2:4 */
-+	/* default FCLK is 120 MHz ! */
-+	ldr	r0, =CLKDIVN
-+	mov	r1, #3
-+	str	r1, [r0]
+-	/* FCLK:HCLK:PCLK = 1:2:4 */
+-	/* default FCLK is 120 MHz ! */
+-	ldr	r0, =CLKDIVN
+-	mov	r1, #3
+-	str	r1, [r0]
++# if defined(CONFIG_S3C2440)  
++  
++#  define MPLLCON 0x4C000004 /* 系统主频配置寄存器 */  
++#  define UPLLCON 0x4C000008 /* USB频率配置寄存器 */  
++#  define CAMDIVN 0x4C000018 /* CAMERA时钟分频寄存器 */  
++#  define MMDIV_405 (0x7f<<12)  
++#  define MPSDIV_405 0x21  
++#  define UMDIV_48 (0x38<<12)  
++#  define UPSDIV_48 0X22  
++  
++    ldr r0, =CAMDIVN  
++    mov r1, #0  
++    str r1, [r0]  
++  
++        /* FCLK:HCLK:PCLK = 1:2:4 */  
++        /* default FCLK is 120 MHz ! */  
++    ldr r0, =CLKDIVN  
++    mov r1, #0x05  
++    str r1, [r0]  
++  
++    /* 如果HDIVN不等于0，CPU必须设置为异步总线模式 */  
++    mrc p15, 0, r0, c1, c0, 0  
++    orr r0, r0, #0xC0000000  
++    mcr p15, 0, r0, c1, c0, 0  
++  
++    ldr r0, =UPLLCON  
++    mov r1, #UMDIV_48 /* USB时钟48MHz */  
++    add r1, r1, #UPSDIV_48  
++    str r1, [r0]  
++    /* 
++     * When you set MPLL&UPLL values, you have to set the UPLL 
++     * value first and then the MPLL value. (Needs intervals 
++     * approximately 7 NOP) 
++     */  
++    nop  
++    nop  
++    nop  
++    nop  
++    nop  
++    nop  
++    nop  
++    ldr r0, =MPLLCON  
++    mov r1, #MMDIV_405 /* cpu时钟 400MHz */  
++    add r1, r1, #MPSDIV_405  
++    str r1, [r0]  
++  
++# else  
++        /* FCLK:HCLK:PCLK = 1:2:4 */  
++        /* default FCLK is 120 MHz ! */  
++        ldr     r0, =CLKDIVN  
++        mov     r1, #3  
++        str     r1, [r0]  
++#endif  /* CONFIG_S3C2440 */  
++
  #endif	/* CONFIG_S3C24X0 */
  
  	/*
- 	 * we do sys-critical inits only at reboot,
- 	 * not when booting from ram!
- 	 */
--#ifndef CONFIG_SKIP_LOWLEVEL_INIT		//如果boot直接下载进入ram运行 需要定义此宏
-+#ifndef CONFIG_SKIP_LOWLEVEL_INIT
+@@ -94,7 +148,7 @@
+ #ifndef CONFIG_SKIP_LOWLEVEL_INIT
  	bl	cpu_init_crit
  #endif
--#endif /*  CONFIG_SPL_BUILD  */
-+
+-
++#endif /*  CONFIG_SPL_BUILD  */
  	bl	_main
  
  /*------------------------------------------------------------------------------*/
-diff -urN u-boot-2016.05_release/arch/arm/Kconfig u-boot-2016.05_base/arch/arm/Kconfig
---- u-boot-2016.05_release/arch/arm/Kconfig	2017-09-16 23:07:44.201812598 +0800
-+++ u-boot-2016.05_base/arch/arm/Kconfig	2016-05-16 22:40:32.000000000 +0800
-@@ -96,10 +96,6 @@
+diff -urN u-boot-2016.05_base/arch/arm/Kconfig u-boot-2016.05_release/arch/arm/Kconfig
+--- u-boot-2016.05_base/arch/arm/Kconfig	2016-05-16 22:40:32.000000000 +0800
++++ u-boot-2016.05_release/arch/arm/Kconfig	2017-10-03 12:18:49.235702876 +0800
+@@ -96,6 +96,10 @@
  	bool "Support smdk2410"
  	select CPU_ARM920T
  
--config TARGET_MINI2440
--	bool "Support mini2440"
--	select CPU_ARM920T
--
++config TARGET_MINI2440
++	bool "Support mini2440"
++	select CPU_ARM920T
++
  config TARGET_ASPENITE
  	bool "Support aspenite"
  	select CPU_ARM926EJS
-@@ -858,7 +854,6 @@
+@@ -854,6 +858,7 @@
  source "board/phytec/pcm052/Kconfig"
  source "board/ppcag/bg0900/Kconfig"
  source "board/samsung/smdk2410/Kconfig"
--source "board/samsung/mini2440/Kconfig"
++source "board/samsung/mini2440/Kconfig"
  source "board/sandisk/sansa_fuze_plus/Kconfig"
  source "board/schulercontrol/sc_sps_1/Kconfig"
  source "board/siemens/draco/Kconfig"
-diff -urN u-boot-2016.05_release/arch/arm/lib/crt0.S u-boot-2016.05_base/arch/arm/lib/crt0.S
---- u-boot-2016.05_release/arch/arm/lib/crt0.S	2017-09-17 17:35:09.194076565 +0800
-+++ u-boot-2016.05_base/arch/arm/lib/crt0.S	2016-05-16 22:40:32.000000000 +0800
-@@ -89,16 +89,8 @@
+diff -urN u-boot-2016.05_base/arch/arm/lib/crt0.S u-boot-2016.05_release/arch/arm/lib/crt0.S
+--- u-boot-2016.05_base/arch/arm/lib/crt0.S	2016-05-16 22:40:32.000000000 +0800
++++ u-boot-2016.05_release/arch/arm/lib/crt0.S	2017-10-05 10:22:35.961653622 +0800
+@@ -89,8 +89,16 @@
  	mov	r9, r0
  	bl	board_init_f_init_reserve
  
--#if defined(CONFIG_SPL_BUILD)
--	ldr r0, =CONFIG_UBOOT_NAND_ADDR			//定义在include/configs/mini2440.h
--	ldr r1, =CONFIG_SYS_TEXT_BASE            
--	ldr r2, =CONFIG_UBOOT_LENGTH	
--	bl  copy_code_to_sdram
--	ldr pc, =CONFIG_SYS_TEXT_BASE
--#else
++#if defined(CONFIG_SPL_BUILD)
++	ldr r0, =CONFIG_UBOOT_NAND_ADDR			//定义在include/configs/mini2440.h
++	ldr r1, =CONFIG_SYS_TEXT_BASE            
++	ldr r2, =CONFIG_UBOOT_LENGTH	
++	bl  copy_code_to_sdram
++	ldr pc, =CONFIG_SYS_TEXT_BASE
++#else
  	mov	r0, #0
  	bl	board_init_f
--#endif
++#endif
  
  #if ! defined(CONFIG_SPL_BUILD)
  
-diff -urN u-boot-2016.05_release/board/samsung/mini2440/Kconfig u-boot-2016.05_base/board/samsung/mini2440/Kconfig
---- u-boot-2016.05_release/board/samsung/mini2440/Kconfig	2017-09-16 23:04:18.985812136 +0800
-+++ u-boot-2016.05_base/board/samsung/mini2440/Kconfig	1970-01-01 08:00:00.000000000 +0800
-@@ -1,15 +0,0 @@
--if TARGET_MINI2440
--
--config SYS_BOARD
--	default "mini2440"
--
--config SYS_VENDOR
--	default "samsung"
--
--config SYS_SOC
--	default "s3c24x0"
--
--config SYS_CONFIG_NAME
--	default "mini2440"
--
--endif
-diff -urN u-boot-2016.05_release/board/samsung/mini2440/lowlevel_init.S u-boot-2016.05_base/board/samsung/mini2440/lowlevel_init.S
---- u-boot-2016.05_release/board/samsung/mini2440/lowlevel_init.S	2017-09-17 17:28:07.202075615 +0800
-+++ u-boot-2016.05_base/board/samsung/mini2440/lowlevel_init.S	1970-01-01 08:00:00.000000000 +0800
-@@ -1,146 +0,0 @@
--/*
-- * Memory Setup stuff - taken from blob memsetup.S
-- *
-- * Copyright (C) 1999 2000 2001 Erik Mouw (J.A.K.Mouw@its.tudelft.nl) and
-- *                     Jan-Derk Bakker (J.D.Bakker@its.tudelft.nl)
-- *
-- * Modified for the Samsung SMDK2410 by
-- * (C) Copyright 2002
-- * David Mueller, ELSOFT AG, <d.mueller@elsoft.ch>
-- *
-- * SPDX-License-Identifier:	GPL-2.0+
-- */
--
--
--#include <config.h>
--
--/* some parameters for the board */
--
--/*
-- *
-- * Taken from linux/arch/arm/boot/compressed/head-s3c2410.S
-- *
-- * Copyright (C) 2002 Samsung Electronics SW.LEE  <hitchcar@sec.samsung.com>
-- *
-- */
--
--#define BWSCON	0x48000000
--
--/* BWSCON */
--#define DW8			(0x0)
--#define DW16			(0x1)
--#define DW32			(0x2)
--#define WAIT			(0x1<<2)
--#define UBLB			(0x1<<3)
--
--#define B1_BWSCON		(DW32)
--#define B2_BWSCON		(DW16)
--#define B3_BWSCON		(DW16 + WAIT + UBLB)
--#define B4_BWSCON		(DW16)
--#define B5_BWSCON		(DW16)
--#define B6_BWSCON		(DW32)
--#define B7_BWSCON		(DW32)
--
--/* BANK0CON */
--#define B0_Tacs			0x0	/*  0clk */
--#define B0_Tcos			0x0	/*  0clk */
--#define B0_Tacc			0x7	/* 14clk */
--#define B0_Tcoh			0x0	/*  0clk */
--#define B0_Tah			0x0	/*  0clk */
--#define B0_Tacp			0x0
--#define B0_PMC			0x0	/* normal */
--
--/* BANK1CON */
--#define B1_Tacs			0x0	/*  0clk */
--#define B1_Tcos			0x0	/*  0clk */
--#define B1_Tacc			0x7	/* 14clk */
--#define B1_Tcoh			0x0	/*  0clk */
--#define B1_Tah			0x0	/*  0clk */
--#define B1_Tacp			0x0
--#define B1_PMC			0x0
--
--#define B2_Tacs			0x0
--#define B2_Tcos			0x0
--#define B2_Tacc			0x7
--#define B2_Tcoh			0x0
--#define B2_Tah			0x0
--#define B2_Tacp			0x0
--#define B2_PMC			0x0
--
--#define B3_Tacs			0x0	/*  0clk */
--#define B3_Tcos			0x3	/*  4clk */
--#define B3_Tacc			0x7	/* 14clk */
--#define B3_Tcoh			0x1	/*  1clk */
--#define B3_Tah			0x0	/*  0clk */
--#define B3_Tacp			0x3     /*  6clk */
--#define B3_PMC			0x0	/* normal */
--
--#define B4_Tacs			0x0	/*  0clk */
--#define B4_Tcos			0x0	/*  0clk */
--#define B4_Tacc			0x7	/* 14clk */
--#define B4_Tcoh			0x0	/*  0clk */
--#define B4_Tah			0x0	/*  0clk */
--#define B4_Tacp			0x0
--#define B4_PMC			0x0	/* normal */
--
--#define B5_Tacs			0x0	/*  0clk */
--#define B5_Tcos			0x0	/*  0clk */
--#define B5_Tacc			0x7	/* 14clk */
--#define B5_Tcoh			0x0	/*  0clk */
--#define B5_Tah			0x0	/*  0clk */
--#define B5_Tacp			0x0
--#define B5_PMC			0x0	/* normal */
--
--#define B6_MT			0x3	/* SDRAM */
--#define B6_Trcd			0x1
--#define B6_SCAN			0x1	/* 9bit */
--
--#define B7_MT			0x3	/* SDRAM */
--#define B7_Trcd			0x1	/* 3clk */
--#define B7_SCAN			0x1	/* 9bit */
--
--/* REFRESH parameter */
--#define REFEN			0x1	/* Refresh enable */
--#define TREFMD			0x0	/* CBR(CAS before RAS)/Auto refresh */
--#define Trp			0x0	/* 2clk */
--#define Trc			0x3	/* 7clk */
--#define Tchr			0x2	/* 3clk */
--#define REFCNT			1113	/* period=15.6us, HCLK=60Mhz, (2048+1-15.6*60) */
--/**************************************/
--
--.globl lowlevel_init
--lowlevel_init:
--	/* memory control configuration */
--	/* make r0 relative the current location so that it */
--	/* reads SMRDATA out of FLASH rather than memory ! */
--	ldr     r0, =SMRDATA
--	ldr	r1, =0x0
--	sub	r0, r0, r1
--	ldr	r1, =BWSCON	/* Bus Width Status Controller */
--	add     r2, r0, #13*4
--0:
--	ldr     r3, [r0], #4
--	str     r3, [r1], #4
--	cmp     r2, r0
--	bne     0b
--
--	/* everything is fine now */
--	mov	pc, lr
--
--	.ltorg
--/* the literal pools origin */
--
--SMRDATA:
--    .word (0+(B1_BWSCON<<4)+(B2_BWSCON<<8)+(B3_BWSCON<<12)+(B4_BWSCON<<16)+(B5_BWSCON<<20)+(B6_BWSCON<<24)+(B7_BWSCON<<28))
--    .word ((B0_Tacs<<13)+(B0_Tcos<<11)+(B0_Tacc<<8)+(B0_Tcoh<<6)+(B0_Tah<<4)+(B0_Tacp<<2)+(B0_PMC))
--    .word ((B1_Tacs<<13)+(B1_Tcos<<11)+(B1_Tacc<<8)+(B1_Tcoh<<6)+(B1_Tah<<4)+(B1_Tacp<<2)+(B1_PMC))
--    .word ((B2_Tacs<<13)+(B2_Tcos<<11)+(B2_Tacc<<8)+(B2_Tcoh<<6)+(B2_Tah<<4)+(B2_Tacp<<2)+(B2_PMC))
--    .word ((B3_Tacs<<13)+(B3_Tcos<<11)+(B3_Tacc<<8)+(B3_Tcoh<<6)+(B3_Tah<<4)+(B3_Tacp<<2)+(B3_PMC))
--    .word ((B4_Tacs<<13)+(B4_Tcos<<11)+(B4_Tacc<<8)+(B4_Tcoh<<6)+(B4_Tah<<4)+(B4_Tacp<<2)+(B4_PMC))
--    .word ((B5_Tacs<<13)+(B5_Tcos<<11)+(B5_Tacc<<8)+(B5_Tcoh<<6)+(B5_Tah<<4)+(B5_Tacp<<2)+(B5_PMC))
--    .word ((B6_MT<<15)+(B6_Trcd<<2)+(B6_SCAN))
--    .word ((B7_MT<<15)+(B7_Trcd<<2)+(B7_SCAN))
--    .word ((REFEN<<23)+(TREFMD<<22)+(Trp<<20)+(Trc<<18)+(Tchr<<16)+REFCNT)
--    .word 0x32
--    .word 0x30
--    .word 0x30
-diff -urN u-boot-2016.05_release/board/samsung/mini2440/MAINTAINERS u-boot-2016.05_base/board/samsung/mini2440/MAINTAINERS
---- u-boot-2016.05_release/board/samsung/mini2440/MAINTAINERS	2017-09-16 23:03:19.537812002 +0800
-+++ u-boot-2016.05_base/board/samsung/mini2440/MAINTAINERS	1970-01-01 08:00:00.000000000 +0800
-@@ -1,6 +0,0 @@
--SMDK2410 BOARD
--M:	David Müller <d.mueller@elsoft.ch>
--S:	Maintained
--F:	board/samsung/smdk2410/
--F:	include/configs/smdk2410.h
--F:	configs/smdk2410_defconfig
-diff -urN u-boot-2016.05_release/board/samsung/mini2440/Makefile u-boot-2016.05_base/board/samsung/mini2440/Makefile
---- u-boot-2016.05_release/board/samsung/mini2440/Makefile	2017-09-17 17:12:31.130073508 +0800
-+++ u-boot-2016.05_base/board/samsung/mini2440/Makefile	1970-01-01 08:00:00.000000000 +0800
-@@ -1,10 +0,0 @@
--#
--# (C) Copyright 2000-2006
--# Wolfgang Denk, DENX Software Engineering, wd@denx.de.
--#
--# SPDX-License-Identifier:	GPL-2.0+
--#
--
--obj-y			:= mini2440.o
--obj-y			+= lowlevel_init.o
--obj-$(CONFIG_SPL_BUILD) += nand_read_ll.o
-diff -urN u-boot-2016.05_release/board/samsung/mini2440/mini2440.c u-boot-2016.05_base/board/samsung/mini2440/mini2440.c
---- u-boot-2016.05_release/board/samsung/mini2440/mini2440.c	2017-09-24 16:15:48.154070363 +0800
-+++ u-boot-2016.05_base/board/samsung/mini2440/mini2440.c	1970-01-01 08:00:00.000000000 +0800
-@@ -1,123 +0,0 @@
--/*
-- * (C) Copyright 2002
-- * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
-- * Marius Groeger <mgroeger@sysgo.de>
-- *
-- * (C) Copyright 2002, 2010
-- * David Mueller, ELSOFT AG, <d.mueller@elsoft.ch>
-- *
-- * SPDX-License-Identifier:	GPL-2.0+
-- */
--
--#include <common.h>
--#include <netdev.h>
--#include <asm/io.h>
--#include <asm/arch/s3c24x0_cpu.h>
--
--DECLARE_GLOBAL_DATA_PTR;
--
--#define FCLK_SPEED 1
--
--#if (FCLK_SPEED == 0)		/* Fout = 203MHz, Fin = 12MHz for Audio */
--#define M_MDIV	0xC3
--#define M_PDIV	0x4
--#define M_SDIV	0x1
--#elif (FCLK_SPEED == 1)		/* Fout = 202.8MHz */
--#define M_MDIV	0xA1
--#define M_PDIV	0x3
--#define M_SDIV	0x1
--#endif
--
--#define USB_CLOCK 1
--
--#if (USB_CLOCK == 0)
--#define U_M_MDIV	0xA1
--#define U_M_PDIV	0x3
--#define U_M_SDIV	0x1
--#elif (USB_CLOCK == 1)
--#define U_M_MDIV	0x48
--#define U_M_PDIV	0x3
--#define U_M_SDIV	0x2
--#endif
--
--static inline void pll_delay(unsigned long loops)
--{
--	__asm__ volatile ("1:\n"
--	  "subs %0, %1, #1\n"
--	  "bne 1b" : "=r" (loops) : "0" (loops));
--}
--
--/*
-- * Miscellaneous platform dependent initialisations
-- */
--
--int board_early_init_f(void)
--{
--
--	struct s3c24x0_gpio * const gpio = s3c24x0_get_base_gpio();
--	/* set up the I/O ports */
--	writel(0x007FFFFF, &gpio->gpacon);
--	writel(0x00044555, &gpio->gpbcon);
--	writel(0x000007FF, &gpio->gpbup);
--	writel(0xAAAAAAAA, &gpio->gpccon);
--	writel(0x0000FFFF, &gpio->gpcup);
--	writel(0xAAAAAAAA, &gpio->gpdcon);
--	writel(0x0000FFFF, &gpio->gpdup);
--	writel(0xAAAAAAAA, &gpio->gpecon);
--	writel(0x0000FFFF, &gpio->gpeup);
--	writel(0x000055AA, &gpio->gpfcon);
--	writel(0x000000FF, &gpio->gpfup);
--	writel(0xFF95FFBA, &gpio->gpgcon);
--	writel(0x0000FFFF, &gpio->gpgup);
--	writel(0x002AFAAA, &gpio->gphcon);
--	writel(0x000007FF, &gpio->gphup);
--
--	return 0;
--}
--
--int board_init(void)
--{
--	/* arch number of SMDK2410-Board */
--	gd->bd->bi_arch_number = MACH_TYPE_MINI2440;
--
--	/* adress of boot parameters */
--	gd->bd->bi_boot_params = 0x30000100;
--
--	icache_enable();
--	dcache_enable();
--
--	return 0;
--}
--
--int dram_init(void)
--{
--	/* dram_init must store complete ramsize in gd->ram_size */
--	gd->ram_size = PHYS_SDRAM_1_SIZE;
--	return 0;
--}
--
--#ifdef CONFIG_CMD_NET
--int board_eth_init(bd_t *bis)
--{
--	int rc = 0;
--#ifdef CONFIG_CS8900
--	rc = cs8900_initialize(0, CONFIG_CS8900_BASE);
--#endif
--#ifdef CONFIG_DRIVER_DM9000
--	rc = dm9000_initialize(bis);
--#endif
--	return rc;
--}
--#endif
--
--/*
-- * Hardcoded flash setup:
-- * Flash 0 is a non-CFI AMD AM29LV800BB flash.
-- */
--ulong board_flash_get_legacy(ulong base, int banknum, flash_info_t *info)
--{
--	info->portwidth = FLASH_CFI_16BIT;
--	info->chipwidth = FLASH_CFI_BY16;
--	info->interface = FLASH_CFI_X16;
--	return 1;
--}
-diff -urN u-boot-2016.05_release/board/samsung/mini2440/nand_read_ll.c u-boot-2016.05_base/board/samsung/mini2440/nand_read_ll.c
---- u-boot-2016.05_release/board/samsung/mini2440/nand_read_ll.c	2017-09-17 17:09:04.378073043 +0800
-+++ u-boot-2016.05_base/board/samsung/mini2440/nand_read_ll.c	1970-01-01 08:00:00.000000000 +0800
-@@ -1,146 +0,0 @@
--/* NAND FLASH 控制器 */
--
--#define NFCONF (*((volatile unsigned long *)0x4E000000))
--#define NFCONT (*((volatile unsigned long *)0x4E000004))
--#define NFCMMD (*((volatile unsigned char *)0x4E000008))
--#define NFADDR (*((volatile unsigned char *)0x4E00000C))
--#define NFDATA (*((volatile unsigned char *)0x4E000010))
--#define NFSTAT (*((volatile unsigned char *)0x4E000020))
--static void nand_read_ll(unsigned int addr, unsigned char *buf, unsigned int len);
--
--static int isBootFromNorFlash(void)
--{
--    volatile int *p = (volatile int *)0;
--    int val;
--    val = *p;
--    *p = 0x12345678;
--    if(*p == 0x12345678)
--    {
--        /* 写成功,是 nand启动 */
--        *p = val;
--        return 0;
--    }
--    else
--    {
--        /* NOR 不能像内存一样写 */
--        return 1;
--    }
--
--}
--
--void nand_init_ll(void)
--{
--#define TACLS 0
--#define TWRPH0 1
--#define TWRPH1 0
--    /* 设置时序 */
--    NFCONF = (TACLS<<12)|(TWRPH0<<8)|(TWRPH1<<4);
--    /* 使能 NAND Flash控制器,初始化 ECC,禁止片选 */
--    NFCONT = (1<<4)|(1<<1)|(1<<0);
--
--}
--
--int copy_code_to_sdram(unsigned char *src, unsigned char *dest, unsigned int len)
--{
--    int i = 0;
--    /* 如果是 NOR启动 */
--    if(isBootFromNorFlash())
--    {
--        while (i < len)
--        {
--            dest[i] = src[i];
--            i++;
--        }
--    }
--    else
--    {
--        nand_init_ll();
--        nand_read_ll((unsigned int)src, dest, len);
--    }
--    return 0;
--}
--
--void clear_bss(void)
--{
--    extern int __bss_start, __bss_end;
--    int *p = &__bss_start;
--    for (; p < &__bss_end; p++)
--        *p = 0;
--
--}
--
--static void nand_select(void)
--{
--    NFCONT &= ~(1<<1);
--}
--
--static void nand_deselect(void)
--{
--    NFCONT |= (1<<1);
--}
--
--static void nand_cmd(unsigned char cmd)
--{
--    volatile int i;
--    NFCMMD = cmd;
--    for (i = 0; i < 10; i++);
--
--}
--
--static void nand_addr(unsigned int addr)
--{
--    unsigned int col = addr % 2048;
--    unsigned int page = addr / 2048;
--    volatile int i;
--    NFADDR = col & 0xff;
--    for (i = 0; i < 10; i++);
--        NFADDR = (col >> 8) & 0xff;
--    for (i = 0; i < 10; i++);
--        NFADDR = page & 0xff;
--    for (i = 0; i < 10; i++);
--        NFADDR = (page >> 8) & 0xff;
--    for (i = 0; i < 10; i++);
--        NFADDR = (page >> 16) & 0xff;
--    for (i = 0; i < 10; i++);
--
--}
--
--static void nand_wait_ready(void)
--{
--    while (!(NFSTAT & 1));
--}
--
--static unsigned char nand_data(void)
--{
--    return NFDATA;
--}
--
--static void nand_read_ll(unsigned int addr, unsigned char *buf, unsigned int len)
--{
--    int col = addr % 2048;
--    int i = 0;
--    /* 1. 选中 */
--    nand_select();
--    while (i < len)
--    {
--        /* 2. 发出读命令 00h */
--        nand_cmd(0x00);
--        /* 3. 发出地址(分 5步发出) */
--        nand_addr(addr);
--        /* 4. 发出读命令 30h */
--        nand_cmd(0x30);
--        /* 5. 判断状态 */
--        nand_wait_ready();
--        /* 6. 读数据 */
--        for (; (col < 2048) && (i < len); col++)
--        {
--            buf[i] = nand_data();
--            i++;
--            addr++;
--        }
--        col = 0;
--    }
--    /* 7. 取消选中 */
--    nand_deselect();
--
--}
+@@ -118,7 +126,7 @@
+ 	orr	lr, #1				/* As required by Thumb-only */
+ #endif
+ 	ldr	r0, [r9, #GD_RELOCADDR]		/* r0 = gd->relocaddr */
+-	b	relocate_code
++	b	relocate_code				/*将代码从sdram底部搬运到顶部*/
+ here:
+ /*
+  * now relocate vectors
+diff -urN u-boot-2016.05_base/board/samsung/mini2440/Kconfig u-boot-2016.05_release/board/samsung/mini2440/Kconfig
+--- u-boot-2016.05_base/board/samsung/mini2440/Kconfig	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/board/samsung/mini2440/Kconfig	2017-10-03 12:18:49.235702876 +0800
+@@ -0,0 +1,15 @@
++if TARGET_MINI2440
++
++config SYS_BOARD
++	default "mini2440"
++
++config SYS_VENDOR
++	default "samsung"
++
++config SYS_SOC
++	default "s3c24x0"
++
++config SYS_CONFIG_NAME
++	default "mini2440"
++
++endif
+diff -urN u-boot-2016.05_base/board/samsung/mini2440/lowlevel_init.S u-boot-2016.05_release/board/samsung/mini2440/lowlevel_init.S
+--- u-boot-2016.05_base/board/samsung/mini2440/lowlevel_init.S	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/board/samsung/mini2440/lowlevel_init.S	2017-10-03 12:18:49.235702876 +0800
+@@ -0,0 +1,146 @@
++/*
++ * Memory Setup stuff - taken from blob memsetup.S
++ *
++ * Copyright (C) 1999 2000 2001 Erik Mouw (J.A.K.Mouw@its.tudelft.nl) and
++ *                     Jan-Derk Bakker (J.D.Bakker@its.tudelft.nl)
++ *
++ * Modified for the Samsung SMDK2410 by
++ * (C) Copyright 2002
++ * David Mueller, ELSOFT AG, <d.mueller@elsoft.ch>
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++
++#include <config.h>
++
++/* some parameters for the board */
++
++/*
++ *
++ * Taken from linux/arch/arm/boot/compressed/head-s3c2410.S
++ *
++ * Copyright (C) 2002 Samsung Electronics SW.LEE  <hitchcar@sec.samsung.com>
++ *
++ */
++
++#define BWSCON	0x48000000
++
++/* BWSCON */
++#define DW8			(0x0)
++#define DW16			(0x1)
++#define DW32			(0x2)
++#define WAIT			(0x1<<2)
++#define UBLB			(0x1<<3)
++
++#define B1_BWSCON		(DW32)
++#define B2_BWSCON		(DW16)
++#define B3_BWSCON		(DW16 + WAIT + UBLB)
++#define B4_BWSCON		(DW16)
++#define B5_BWSCON		(DW16)
++#define B6_BWSCON		(DW32)
++#define B7_BWSCON		(DW32)
++
++/* BANK0CON */
++#define B0_Tacs			0x0	/*  0clk */
++#define B0_Tcos			0x0	/*  0clk */
++#define B0_Tacc			0x7	/* 14clk */
++#define B0_Tcoh			0x0	/*  0clk */
++#define B0_Tah			0x0	/*  0clk */
++#define B0_Tacp			0x0
++#define B0_PMC			0x0	/* normal */
++
++/* BANK1CON */
++#define B1_Tacs			0x0	/*  0clk */
++#define B1_Tcos			0x0	/*  0clk */
++#define B1_Tacc			0x7	/* 14clk */
++#define B1_Tcoh			0x0	/*  0clk */
++#define B1_Tah			0x0	/*  0clk */
++#define B1_Tacp			0x0
++#define B1_PMC			0x0
++
++#define B2_Tacs			0x0
++#define B2_Tcos			0x0
++#define B2_Tacc			0x7
++#define B2_Tcoh			0x0
++#define B2_Tah			0x0
++#define B2_Tacp			0x0
++#define B2_PMC			0x0
++
++#define B3_Tacs			0x0	/*  0clk */
++#define B3_Tcos			0x3	/*  4clk */
++#define B3_Tacc			0x7	/* 14clk */
++#define B3_Tcoh			0x1	/*  1clk */
++#define B3_Tah			0x0	/*  0clk */
++#define B3_Tacp			0x3     /*  6clk */
++#define B3_PMC			0x0	/* normal */
++
++#define B4_Tacs			0x0	/*  0clk */
++#define B4_Tcos			0x0	/*  0clk */
++#define B4_Tacc			0x7	/* 14clk */
++#define B4_Tcoh			0x0	/*  0clk */
++#define B4_Tah			0x0	/*  0clk */
++#define B4_Tacp			0x0
++#define B4_PMC			0x0	/* normal */
++
++#define B5_Tacs			0x0	/*  0clk */
++#define B5_Tcos			0x0	/*  0clk */
++#define B5_Tacc			0x7	/* 14clk */
++#define B5_Tcoh			0x0	/*  0clk */
++#define B5_Tah			0x0	/*  0clk */
++#define B5_Tacp			0x0
++#define B5_PMC			0x0	/* normal */
++
++#define B6_MT			0x3	/* SDRAM */
++#define B6_Trcd			0x1
++#define B6_SCAN			0x1	/* 9bit */
++
++#define B7_MT			0x3	/* SDRAM */
++#define B7_Trcd			0x1	/* 3clk */
++#define B7_SCAN			0x1	/* 9bit */
++
++/* REFRESH parameter */
++#define REFEN			0x1	/* Refresh enable */
++#define TREFMD			0x0	/* CBR(CAS before RAS)/Auto refresh */
++#define Trp			0x0	/* 2clk */
++#define Trc			0x3	/* 7clk */
++#define Tchr			0x2	/* 3clk */
++#define REFCNT			1113	/* period=15.6us, HCLK=60Mhz, (2048+1-15.6*60) */
++/**************************************/
++
++.globl lowlevel_init
++lowlevel_init:
++	/* memory control configuration */
++	/* make r0 relative the current location so that it */
++	/* reads SMRDATA out of FLASH rather than memory ! */
++	ldr     r0, =SMRDATA
++	ldr	r1, =0				/*重定向地址修改为0*/
++	sub	r0, r0, r1
++	ldr	r1, =BWSCON	/* Bus Width Status Controller */
++	add     r2, r0, #13*4
++0:
++	ldr     r3, [r0], #4
++	str     r3, [r1], #4
++	cmp     r2, r0
++	bne     0b
++
++	/* everything is fine now */
++	mov	pc, lr
++
++	.ltorg
++/* the literal pools origin */
++
++SMRDATA:
++    .word (0+(B1_BWSCON<<4)+(B2_BWSCON<<8)+(B3_BWSCON<<12)+(B4_BWSCON<<16)+(B5_BWSCON<<20)+(B6_BWSCON<<24)+(B7_BWSCON<<28))
++    .word ((B0_Tacs<<13)+(B0_Tcos<<11)+(B0_Tacc<<8)+(B0_Tcoh<<6)+(B0_Tah<<4)+(B0_Tacp<<2)+(B0_PMC))
++    .word ((B1_Tacs<<13)+(B1_Tcos<<11)+(B1_Tacc<<8)+(B1_Tcoh<<6)+(B1_Tah<<4)+(B1_Tacp<<2)+(B1_PMC))
++    .word ((B2_Tacs<<13)+(B2_Tcos<<11)+(B2_Tacc<<8)+(B2_Tcoh<<6)+(B2_Tah<<4)+(B2_Tacp<<2)+(B2_PMC))
++    .word ((B3_Tacs<<13)+(B3_Tcos<<11)+(B3_Tacc<<8)+(B3_Tcoh<<6)+(B3_Tah<<4)+(B3_Tacp<<2)+(B3_PMC))
++    .word ((B4_Tacs<<13)+(B4_Tcos<<11)+(B4_Tacc<<8)+(B4_Tcoh<<6)+(B4_Tah<<4)+(B4_Tacp<<2)+(B4_PMC))
++    .word ((B5_Tacs<<13)+(B5_Tcos<<11)+(B5_Tacc<<8)+(B5_Tcoh<<6)+(B5_Tah<<4)+(B5_Tacp<<2)+(B5_PMC))
++    .word ((B6_MT<<15)+(B6_Trcd<<2)+(B6_SCAN))
++    .word ((B7_MT<<15)+(B7_Trcd<<2)+(B7_SCAN))
++    .word ((REFEN<<23)+(TREFMD<<22)+(Trp<<20)+(Trc<<18)+(Tchr<<16)+REFCNT)
++    .word 0x32
++    .word 0x30
++    .word 0x30
+diff -urN u-boot-2016.05_base/board/samsung/mini2440/MAINTAINERS u-boot-2016.05_release/board/samsung/mini2440/MAINTAINERS
+--- u-boot-2016.05_base/board/samsung/mini2440/MAINTAINERS	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/board/samsung/mini2440/MAINTAINERS	2017-10-03 12:18:49.235702876 +0800
+@@ -0,0 +1,6 @@
++MINI2440 BOARD
++M:	David Müller <d.mueller@elsoft.ch>
++S:	Maintained
++F:	board/samsung/mini2440/
++F:	include/configs/mini2440.h
++F:	configs/mini2440_defconfig
+diff -urN u-boot-2016.05_base/board/samsung/mini2440/Makefile u-boot-2016.05_release/board/samsung/mini2440/Makefile
+--- u-boot-2016.05_base/board/samsung/mini2440/Makefile	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/board/samsung/mini2440/Makefile	2017-10-03 12:18:49.235702876 +0800
+@@ -0,0 +1,11 @@
++#
++# (C) Copyright 2000-2006
++# Wolfgang Denk, DENX Software Engineering, wd@denx.de.
++#
++# SPDX-License-Identifier:	GPL-2.0+
++#
++
++obj-y	:= mini2440.o
++obj-y	+= lowlevel_init.o
++obj-$(CONFIG_SPL_BUILD)	+=nand_read_ll.o
++
+diff -urN u-boot-2016.05_base/board/samsung/mini2440/mini2440.c u-boot-2016.05_release/board/samsung/mini2440/mini2440.c
+--- u-boot-2016.05_base/board/samsung/mini2440/mini2440.c	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/board/samsung/mini2440/mini2440.c	2017-10-03 12:18:49.235702876 +0800
+@@ -0,0 +1,103 @@
++/*
++ * (C) Copyright 2002
++ * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
++ * Marius Groeger <mgroeger@sysgo.de>
++ *
++ * (C) Copyright 2002, 2010
++ * David Mueller, ELSOFT AG, <d.mueller@elsoft.ch>
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#include <common.h>
++#include <netdev.h>
++#include <asm/io.h>
++#include <asm/arch/s3c24x0_cpu.h>
++
++DECLARE_GLOBAL_DATA_PTR;
++
++
++static inline void pll_delay(unsigned long loops)
++{
++	__asm__ volatile ("1:\n"
++	  "subs %0, %1, #1\n"
++	  "bne 1b" : "=r" (loops) : "0" (loops));
++}
++
++/*
++ * Miscellaneous platform dependent initialisations
++ */
++
++int board_early_init_f(void)
++{
++
++	struct s3c24x0_gpio * const gpio = s3c24x0_get_base_gpio();
++
++	
++
++	/* set up the I/O ports */
++	writel(0x007FFFFF, &gpio->gpacon);
++	writel(0x00044555, &gpio->gpbcon);
++	writel(0x000007FF, &gpio->gpbup);
++	writel(0xAAAAAAAA, &gpio->gpccon);
++	writel(0x0000FFFF, &gpio->gpcup);
++	writel(0xAAAAAAAA, &gpio->gpdcon);
++	writel(0x0000FFFF, &gpio->gpdup);
++	writel(0xAAAAAAAA, &gpio->gpecon);
++	writel(0x0000FFFF, &gpio->gpeup);
++	writel(0x000055AA, &gpio->gpfcon);
++	writel(0x000000FF, &gpio->gpfup);
++	writel(0xFF95FFBA, &gpio->gpgcon);
++	writel(0x0000FFFF, &gpio->gpgup);
++	writel(0x002AFAAA, &gpio->gphcon);
++	writel(0x000007FF, &gpio->gphup);
++
++	return 0;
++}
++
++int board_init(void)
++{
++	/* arch number of MINI2440-Board */
++	gd->bd->bi_arch_number = MACH_TYPE_MINI2440;
++
++	/* adress of boot parameters */
++	gd->bd->bi_boot_params = 0x30000100;
++
++	icache_enable();
++	dcache_enable();
++
++	return 0;
++}
++
++int dram_init(void)
++{
++	/* dram_init must store complete ramsize in gd->ram_size */
++	gd->ram_size = PHYS_SDRAM_1_SIZE;
++	return 0;
++}
++
++#ifdef CONFIG_CMD_NET
++int board_eth_init(bd_t *bis)
++{
++	int rc = 0;
++#ifdef CONFIG_CS8900
++	rc = cs8900_initialize(0, CONFIG_CS8900_BASE);
++#endif
++#ifdef CONFIG_DRIVER_DM9000
++	rc = dm9000_initialize(bis);
++#endif
++	return rc;
++}
++#endif
++
++/*
++ * Hardcoded flash setup:
++ * Flash 0 is a non-CFI AMD AM29LV800BB flash.
++ */
++ulong board_flash_get_legacy(ulong base, int banknum, flash_info_t *info)
++{
++	info->portwidth = FLASH_CFI_16BIT;
++	info->chipwidth = FLASH_CFI_BY16;
++	info->interface = FLASH_CFI_X16;
++	return 1;
++}
+diff -urN u-boot-2016.05_base/board/samsung/mini2440/nand_read_ll.c u-boot-2016.05_release/board/samsung/mini2440/nand_read_ll.c
+--- u-boot-2016.05_base/board/samsung/mini2440/nand_read_ll.c	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/board/samsung/mini2440/nand_read_ll.c	2017-10-03 12:18:49.235702876 +0800
+@@ -0,0 +1,146 @@
++/* NAND FLASH 控制器 */
++
++#define NFCONF (*((volatile unsigned long *)0x4E000000))
++#define NFCONT (*((volatile unsigned long *)0x4E000004))
++#define NFCMMD (*((volatile unsigned char *)0x4E000008))
++#define NFADDR (*((volatile unsigned char *)0x4E00000C))
++#define NFDATA (*((volatile unsigned char *)0x4E000010))
++#define NFSTAT (*((volatile unsigned char *)0x4E000020))
++static void nand_read_ll(unsigned int addr, unsigned char *buf, unsigned int len);
++
++static int isBootFromNorFlash(void)
++{
++    volatile int *p = (volatile int *)0;
++    int val;
++    val = *p;
++    *p = 0x12345678;
++    if(*p == 0x12345678)
++    {
++        /* 写成功,是 nand启动 */
++        *p = val;
++        return 0;
++    }
++    else
++    {
++        /* NOR 不能像内存一样写 */
++        return 1;
++    }
++
++}
++
++void nand_init_ll(void)
++{
++#define TACLS 0
++#define TWRPH0 1
++#define TWRPH1 0
++    /* 设置时序 */
++    NFCONF = (TACLS<<12)|(TWRPH0<<8)|(TWRPH1<<4);
++    /* 使能 NAND Flash控制器,初始化 ECC,禁止片选 */
++    NFCONT = (1<<4)|(1<<1)|(1<<0);
++
++}
++
++int copy_code_to_sdram(unsigned char *src, unsigned char *dest, unsigned int len)
++{
++    int i = 0;
++    /* 如果是 NOR启动 */
++    if(isBootFromNorFlash())
++    {
++        while (i < len)
++        {
++            dest[i] = src[i];
++            i++;
++        }
++    }
++    else
++    {
++        nand_init_ll();
++        nand_read_ll((unsigned int)src, dest, len);
++    }
++    return 0;
++}
++
++void clear_bss(void)
++{
++    extern int __bss_start, __bss_end;
++    int *p = &__bss_start;
++    for (; p < &__bss_end; p++)
++        *p = 0;
++
++}
++
++static void nand_select(void)
++{
++    NFCONT &= ~(1<<1);
++}
++
++static void nand_deselect(void)
++{
++    NFCONT |= (1<<1);
++}
++
++static void nand_cmd(unsigned char cmd)
++{
++    volatile int i;
++    NFCMMD = cmd;
++    for (i = 0; i < 10; i++);
++
++}
++
++static void nand_addr(unsigned int addr)
++{
++    unsigned int col = addr % 2048;
++    unsigned int page = addr / 2048;
++    volatile int i;
++    NFADDR = col & 0xff;
++    for (i = 0; i < 10; i++);
++        NFADDR = (col >> 8) & 0xff;
++    for (i = 0; i < 10; i++);
++        NFADDR = page & 0xff;
++    for (i = 0; i < 10; i++);
++        NFADDR = (page >> 8) & 0xff;
++    for (i = 0; i < 10; i++);
++        NFADDR = (page >> 16) & 0xff;
++    for (i = 0; i < 10; i++);
++
++}
++
++static void nand_wait_ready(void)
++{
++    while (!(NFSTAT & 1));
++}
++
++static unsigned char nand_data(void)
++{
++    return NFDATA;
++}
++
++static void nand_read_ll(unsigned int addr, unsigned char *buf, unsigned int len)
++{
++    int col = addr % 2048;
++    int i = 0;
++    /* 1. 选中 */
++    nand_select();
++    while (i < len)
++    {
++        /* 2. 发出读命令 00h */
++        nand_cmd(0x00);
++        /* 3. 发出地址(分 5步发出) */
++        nand_addr(addr);
++        /* 4. 发出读命令 30h */
++        nand_cmd(0x30);
++        /* 5. 判断状态 */
++        nand_wait_ready();
++        /* 6. 读数据 */
++        for (; (col < 2048) && (i < len); col++)
++        {
++            buf[i] = nand_data();
++            i++;
++            addr++;
++        }
++        col = 0;
++    }
++    /* 7. 取消选中 */
++    nand_deselect();
++
++}
 \ 文件尾没有换行符
-diff -urN u-boot-2016.05_release/build.sh u-boot-2016.05_base/build.sh
---- u-boot-2016.05_release/build.sh	2017-09-17 18:49:23.434086592 +0800
-+++ u-boot-2016.05_base/build.sh	1970-01-01 08:00:00.000000000 +0800
-@@ -1,3 +0,0 @@
--make -j4
--cp spl/u-boot-spl.bin ~/tftpboot/
--cp u-boot.bin ~/tftpboot/
-diff -urN u-boot-2016.05_release/common/board_f.c u-boot-2016.05_base/common/board_f.c
---- u-boot-2016.05_release/common/board_f.c	2017-09-16 23:33:23.489816063 +0800
-+++ u-boot-2016.05_base/common/board_f.c	2016-05-16 22:40:32.000000000 +0800
-@@ -267,7 +267,7 @@
- static int setup_mon_len(void)
- {
- #if defined(__ARM__) || defined(__MICROBLAZE__)
--	gd->mon_len = (ulong)&__bss_end - (ulong)_start;		//计算uboot具体长度
-+	gd->mon_len = (ulong)&__bss_end - (ulong)_start;
- #elif defined(CONFIG_SANDBOX) || defined(CONFIG_EFI_APP)
- 	gd->mon_len = (ulong)&_end - (ulong)_init;
- #elif defined(CONFIG_BLACKFIN) || defined(CONFIG_NIOS2)
-diff -urN u-boot-2016.05_release/common/board_r.c u-boot-2016.05_base/common/board_r.c
---- u-boot-2016.05_release/common/board_r.c	2017-09-24 14:02:12.914052319 +0800
-+++ u-boot-2016.05_base/common/board_r.c	2016-05-16 22:40:32.000000000 +0800
-@@ -739,7 +739,6 @@
+diff -urN u-boot-2016.05_base/build.sh u-boot-2016.05_release/build.sh
+--- u-boot-2016.05_base/build.sh	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/build.sh	2017-10-03 12:21:23.365634508 +0800
+@@ -0,0 +1,3 @@
++make -j4
++cp spl/u-boot-spl.bin /home/tftpboot/
++cp u-boot.bin /home/tftpboot/
+diff -urN u-boot-2016.05_base/common/board_r.c u-boot-2016.05_release/common/board_r.c
+--- u-boot-2016.05_base/common/board_r.c	2016-05-16 22:40:32.000000000 +0800
++++ u-boot-2016.05_release/common/board_r.c	2017-10-03 12:18:49.235702876 +0800
+@@ -739,6 +739,7 @@
  
  static int run_main_loop(void)
  {
--	run_command("mtdparts default", 0);		//增加此函数免得每次需要输入mtdparts default
++	run_command("mtdparts default", 0);		//增加此函数免得每次需要输入mtdparts default
  #ifdef CONFIG_SANDBOX
  	sandbox_main_loop_init();
  #endif
-diff -urN u-boot-2016.05_release/configs/mini2440_defconfig u-boot-2016.05_base/configs/mini2440_defconfig
---- u-boot-2016.05_release/configs/mini2440_defconfig	2017-09-17 14:02:09.434047796 +0800
-+++ u-boot-2016.05_base/configs/mini2440_defconfig	1970-01-01 08:00:00.000000000 +0800
-@@ -1,11 +0,0 @@
--CONFIG_ARM=y
--CONFIG_TARGET_MINI2440=y
--CONFIG_HUSH_PARSER=y
--CONFIG_SYS_PROMPT="mini2440 # "
--CONFIG_CMD_USB=y
--# CONFIG_CMD_SETEXPR is not set
--CONFIG_CMD_DHCP=y
--CONFIG_CMD_PING=y
--CONFIG_CMD_CACHE=y
--CONFIG_CMD_EXT2=y
--CONFIG_CMD_FAT=y
-diff -urN u-boot-2016.05_release/drivers/mtd/cfi_flash.c u-boot-2016.05_base/drivers/mtd/cfi_flash.c
---- u-boot-2016.05_release/drivers/mtd/cfi_flash.c	2017-09-24 13:19:47.350046589 +0800
-+++ u-boot-2016.05_base/drivers/mtd/cfi_flash.c	2016-05-16 22:40:32.000000000 +0800
-@@ -52,8 +52,7 @@
-  */
- 
- DECLARE_GLOBAL_DATA_PTR;
--//#define DEBUG		1
--#define debug(fmt, args...)     printf(fmt, ##args)
-+
- static uint flash_offset_cfi[2] = { FLASH_OFFSET_CFI, FLASH_OFFSET_CFI_ALT };
- #ifdef CONFIG_FLASH_CFI_MTD
- static uint flash_verbose = 1;
-diff -urN u-boot-2016.05_release/drivers/mtd/jedec_flash.c u-boot-2016.05_base/drivers/mtd/jedec_flash.c
---- u-boot-2016.05_release/drivers/mtd/jedec_flash.c	2017-09-17 19:47:57.000000000 +0800
-+++ u-boot-2016.05_base/drivers/mtd/jedec_flash.c	2016-05-16 22:40:32.000000000 +0800
-@@ -67,8 +67,6 @@
- /* EON */
- #define EN29LV040A	0x004F
- 
--
--#define S29AL016J	0xea00
- /*
-  * Unlock address sets for AMD command sets.
-  * Intel command sets use the MTD_UADDR_UNNECESSARY.
-@@ -402,24 +400,6 @@
- 			ERASEINFO(0x10000, 7),
- 		}
- 	},
--	{
--		.mfr_id        = (u16)MX_MANUFACT, // 厂家ID
--		.dev_id        = S29AL016J,      // 设备ID 2249
--		.name        = "S29AL016J",   // 名称随意写
--		.uaddr        = {
--		[1] = MTD_UADDR_0x0555_0x02AA /* x16 */
--		},
--		.DevSize    = SIZE_2MiB,    //NOR FLASH 大小
--		.CmdSet        = CFI_CMDSET_AMD_LEGACY, // 默认 
--		.NumEraseRegions= 4,    // 4个擦除块，在下面写有每个大小
--		.regions    = {
--		ERASEINFO(16*1024, 1),
--		ERASEINFO(8*1024,  2),
--		ERASEINFO(32*1024, 1),
--		ERASEINFO(64*1024, 31),
--		}
--	},
--	   
- #endif
- };
- 
-diff -urN u-boot-2016.05_release/drivers/mtd/nand/Makefile u-boot-2016.05_base/drivers/mtd/nand/Makefile
---- u-boot-2016.05_release/drivers/mtd/nand/Makefile	2017-09-23 21:16:50.794118912 +0800
-+++ u-boot-2016.05_base/drivers/mtd/nand/Makefile	2016-05-16 22:40:32.000000000 +0800
-@@ -63,7 +63,6 @@
+diff -urN u-boot-2016.05_base/configs/mini2440_defconfig u-boot-2016.05_release/configs/mini2440_defconfig
+--- u-boot-2016.05_base/configs/mini2440_defconfig	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/configs/mini2440_defconfig	2017-10-03 12:18:49.235702876 +0800
+@@ -0,0 +1,11 @@
++CONFIG_ARM=y
++CONFIG_TARGET_MINI2440=y
++CONFIG_HUSH_PARSER=y
++CONFIG_SYS_PROMPT="mini2440 # "
++CONFIG_CMD_USB=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_DHCP=y
++CONFIG_CMD_PING=y
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_EXT2=y
++CONFIG_CMD_FAT=y
+\ 文件尾没有换行符
+diff -urN u-boot-2016.05_base/drivers/mtd/nand/Makefile u-boot-2016.05_release/drivers/mtd/nand/Makefile
+--- u-boot-2016.05_base/drivers/mtd/nand/Makefile	2016-05-16 22:40:32.000000000 +0800
++++ u-boot-2016.05_release/drivers/mtd/nand/Makefile	2017-10-03 12:18:49.235702876 +0800
+@@ -63,6 +63,7 @@
  obj-$(CONFIG_NAND_NDFC) += ndfc.o
  obj-$(CONFIG_NAND_PXA3XX) += pxa3xx_nand.o
  obj-$(CONFIG_NAND_S3C2410) += s3c2410_nand.o
--obj-$(CONFIG_NAND_S3C2440) += s3c2440_nand.o
++obj-$(CONFIG_NAND_S3C2440) += s3c2440_nand.o
  obj-$(CONFIG_NAND_SPEAR) += spr_nand.o
  obj-$(CONFIG_TEGRA_NAND) += tegra_nand.o
  obj-$(CONFIG_NAND_OMAP_GPMC) += omap_gpmc.o
-diff -urN u-boot-2016.05_release/drivers/mtd/nand/nand_base.c u-boot-2016.05_base/drivers/mtd/nand/nand_base.c
---- u-boot-2016.05_release/drivers/mtd/nand/nand_base.c	2017-09-24 12:16:14.966038007 +0800
-+++ u-boot-2016.05_base/drivers/mtd/nand/nand_base.c	2016-05-16 22:40:32.000000000 +0800
-@@ -3619,8 +3619,8 @@
- 	struct nand_chip *chip = mtd->priv;
- 	struct nand_flash_dev *type;
- 
--	/* Set the default functions */	
--	nand_set_defaults(chip, chip->options & NAND_BUSWIDTH_16);		//设置chip->cmdfunc=nand_command
-+	/* Set the default functions */
-+	nand_set_defaults(chip, chip->options & NAND_BUSWIDTH_16);
- 
- 	/* Read the flash type */
- 	type = nand_get_flash_type(mtd, chip, &nand_maf_id,
-diff -urN u-boot-2016.05_release/drivers/mtd/nand/s3c2440_nand.c u-boot-2016.05_base/drivers/mtd/nand/s3c2440_nand.c
---- u-boot-2016.05_release/drivers/mtd/nand/s3c2440_nand.c	2017-09-24 12:55:43.402043338 +0800
-+++ u-boot-2016.05_base/drivers/mtd/nand/s3c2440_nand.c	1970-01-01 08:00:00.000000000 +0800
-@@ -1,187 +0,0 @@
--/*
-- * (C) Copyright 2006 OpenMoko, Inc.
-- * Author: Harald Welte <laforge@openmoko.org>
-- *
-- * SPDX-License-Identifier:	GPL-2.0+
-- */
--
--#include <common.h>
--
--#include <nand.h>
--#include <asm/arch/s3c24x0_cpu.h>
--#include <asm/io.h>
--
--#define S3C2440_NFCONF_EN          (1<<15)
--#define S3C2440_NFCONF_512BYTE     (1<<14)
--#define S3C2440_NFCONF_4STEP       (1<<13)
--#define S3C2440_NFCONF_INITECC     (1<<12)
--#define S3C2440_NFCONF_nFCE        (1<<11)
--#define S3C2440_NFCONF_TACLS(x)    ((x)<<8)
--#define S3C2440_NFCONF_TWRPH0(x)   ((x)<<4)
--#define S3C2440_NFCONF_TWRPH1(x)   ((x)<<0)
--
--#define S3C2440_ADDR_NALE 4
--#define S3C2440_ADDR_NCLE 8
--
--#ifdef CONFIG_NAND_SPL
--
--/* in the early stage of NAND flash booting, printf() is not available */
--#define printf(fmt, args...)
--
--static void nand_read_buf(struct mtd_info *mtd, u_char *buf, int len)
--{
--	int i;
--	struct nand_chip *this = mtd->priv;
--
--	for (i = 0; i < len; i++)
--		buf[i] = readb(this->IO_ADDR_R);
--}
--#endif
--
--static void s3c24x0_hwcontrol(struct mtd_info *mtd, int cmd, unsigned int ctrl)
--{
--	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
--	if (ctrl & NAND_CLE)
--	{
--		writeb(cmd,&nand->nfcmd);
--	}
--	else if (ctrl & NAND_ALE )
--	{
--		writeb(cmd,&nand->nfaddr);
--	}
--	else
--	;
--	
--}
--
--static int s3c24x0_dev_ready(struct mtd_info *mtd)
--{
--	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
--	debug("dev_ready\n");
--	return readl(&nand->nfstat) & 0x01;
--}
--
--#ifdef CONFIG_S3C2440_NAND_HWECC
--void s3c24x0_nand_enable_hwecc(struct mtd_info *mtd, int mode)
--{
--	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
--	debug("s3c24x0_nand_enable_hwecc(%p, %d)\n", mtd, mode);
--	writel(readl(&nand->nfconf) | S3C2440_NFCONF_INITECC, &nand->nfconf);
--}
--
--static int s3c24x0_nand_calculate_ecc(struct mtd_info *mtd, const u_char *dat,
--				      u_char *ecc_code)
--{
--	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
--	ecc_code[0] = readb(&nand->nfecc);
--	ecc_code[1] = readb(&nand->nfecc + 1);
--	ecc_code[2] = readb(&nand->nfecc + 2);
--	debug("s3c24x0_nand_calculate_hwecc(%p,): 0x%02x 0x%02x 0x%02x\n",
--	      mtd , ecc_code[0], ecc_code[1], ecc_code[2]);
--
--	return 0;
--}
--
--static int s3c24x0_nand_correct_data(struct mtd_info *mtd, u_char *dat,
--				     u_char *read_ecc, u_char *calc_ecc)
--{
--	if (read_ecc[0] == calc_ecc[0] &&
--	    read_ecc[1] == calc_ecc[1] &&
--	    read_ecc[2] == calc_ecc[2])
--		return 0;
--
--	printf("s3c24x0_nand_correct_data: not implemented\n");
--	return -1;
--}
--#endif
--
--/**
-- * nand_select_chip - [DEFAULT] control CE line
-- * @mtd: MTD device structure
-- * @chipnr: chipnumber to select, -1 for deselect
-- *
-- * Default select function for 1 chip devices.
-- */
-- static void s3c24x0_nand_select(struct mtd_info *mtd, int chipnr)
-- {
--	 struct s3c24x0_nand *nand = s3c24x0_get_base_nand();                          
--	 switch (chipnr) {
--	 case -1:
--	 	nand->nfcont |= (1<<1);
--		break;
--	 case 0:
--	 	nand->nfcont &= ~(1<<1);
--		break;
--	 default:
--		 BUG();
--		 break;
--	 }
-- }
--int board_nand_init(struct nand_chip *nand)
--{
--	u_int32_t cfg;
--	u_int8_t tacls, twrph0, twrph1;
--	struct s3c24x0_clock_power *clk_power = s3c24x0_get_base_clock_power();
--	struct s3c24x0_nand *nand_reg = s3c24x0_get_base_nand();
--
--	debug("board_nand_init()\n");
--
--	writel(readl(&clk_power->clkcon) | (1 << 4), &clk_power->clkcon);
--
--	/* initialize hardware */
--#if defined(CONFIG_S3C24XX_CUSTOM_NAND_TIMING)
--	tacls  = CONFIG_S3C24XX_TACLS;
--	twrph0 = CONFIG_S3C24XX_TWRPH0;
--	twrph1 =  CONFIG_S3C24XX_TWRPH1;
--#else
--	tacls = 4;
--	twrph0 = 8;
--	twrph1 = 8;
--#endif
--/*
--	cfg = S3C2440_NFCONF_EN;
--	cfg |= S3C2440_NFCONF_TACLS(tacls - 1);
--	cfg |= S3C2440_NFCONF_TWRPH0(twrph0 - 1);
--	cfg |= S3C2440_NFCONF_TWRPH1(twrph1 - 1);
--	writel(cfg, &nand_reg->nfconf);
--*/
--	cfg = ((tacls - 1)<<12) | ((twrph0 - 1)<<8) | ((twrph1 - 1)<<4);
--   	writel(cfg, &nand_reg->nfconf);
-- 	writel((1<<4)|(1<<1)|(1<<0), &nand_reg->nfcont);
--	/* initialize nand_chip data structure */
--	nand->IO_ADDR_R = (void *)&nand_reg->nfdata;
--	nand->IO_ADDR_W = (void *)&nand_reg->nfdata;
--
--	//nand->select_chip = NULL;
--	nand->select_chip = s3c24x0_nand_select;			//修改nand片选函数指向
--	/* read_buf and write_buf are default */
--	/* read_byte and write_byte are default */
--#ifdef CONFIG_NAND_SPL
--	nand->read_buf = nand_read_buf;
--#endif
--
--	/* hwcontrol always must be implemented */
--	nand->cmd_ctrl = s3c24x0_hwcontrol;
--
--	nand->dev_ready = s3c24x0_dev_ready;
--
--#ifdef CONFIG_S3C2440_NAND_HWECC
--	nand->ecc.hwctl = s3c24x0_nand_enable_hwecc;
--	nand->ecc.calculate = s3c24x0_nand_calculate_ecc;
--	nand->ecc.correct = s3c24x0_nand_correct_data;
--	nand->ecc.mode = NAND_ECC_HW;
--	nand->ecc.size = CONFIG_SYS_NAND_ECCSIZE;
--	nand->ecc.bytes = CONFIG_SYS_NAND_ECCBYTES;
--	nand->ecc.strength = 1;
--#else
--	nand->ecc.mode = NAND_ECC_SOFT;
--#endif
--
--#ifdef CONFIG_S3C2440_NAND_BBT
--	nand->bbt_options |= NAND_BBT_USE_FLASH;
--#endif
--
--	debug("end of nand_init\n");
--
--	return 0;
--}
-diff -urN u-boot-2016.05_release/include/configs/mini2440.h u-boot-2016.05_base/include/configs/mini2440.h
---- u-boot-2016.05_release/include/configs/mini2440.h	2017-09-24 16:06:20.000000000 +0800
-+++ u-boot-2016.05_base/include/configs/mini2440.h	1970-01-01 08:00:00.000000000 +0800
-@@ -1,209 +0,0 @@
--/*
-- * (C) Copyright 2002
-- * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
-- * Marius Groeger <mgroeger@sysgo.de>
-- * Gary Jennejohn <garyj@denx.de>
-- * David Mueller <d.mueller@elsoft.ch>
-- *
-- * Configuation settings for the SAMSUNG SMDK2410 board.
-- *
-- * SPDX-License-Identifier:	GPL-2.0+
-- */
--
--#ifndef __CONFIG_H
--#define __CONFIG_H
--
--/*
-- * High Level Configuration Options
-- * (easy to change)
-- */
--#define CONFIG_S3C24X0		/* This is a SAMSUNG S3C24x0-type SoC */
--#define CONFIG_S3C2440		/* specifically a SAMSUNG S3C2410 SoC */
--#define CONFIG_MINI2440		/* on a SAMSUNG SMDK2410 Board */
--
--#define CONFIG_SYS_TEXT_BASE	0x30008000
--#define CONFIG_UBOOT_LENGTH     0x100000     /*直接拷贝1M*/
--#define CONFIG_UBOOT_NAND_ADDR  0x20000   /*start of u-boot.bin in NAND*/
--
--
--#define CONFIG_SYS_ARM_CACHE_WRITETHROUGH
--
--/* input clock of PLL (the SMDK2410 has 12MHz input clock) */
--#define CONFIG_SYS_CLK_FREQ	12000000
--
--#define CONFIG_CMDLINE_TAG	/* enable passing of ATAGs */
--#define CONFIG_SETUP_MEMORY_TAGS
--#define CONFIG_INITRD_TAG
--
--/*
-- * Hardware drivers
-- */
--
--/*#define CONFIG_CS8900		*//* we have a CS8900 on-board */
--/*#define CONFIG_CS8900_BASE	0x19000300*/
--/*#define CONFIG_CS8900_BUS16	*//* the Linux driver does accesses as shorts */
--
--#define CONFIG_DRIVER_DM9000
--#define CONFIG_DM9000_BASE                       0x20000000
--#define DM9000_IO                                 CONFIG_DM9000_BASE
--#define DM9000_DATA                              (CONFIG_DM9000_BASE+4)
--/*
-- * select serial console configuration
-- */
--#define CONFIG_S3C24X0_SERIAL
--#define CONFIG_SERIAL1		1	/* we use SERIAL 1 on SMDK2410 */
--
--/************************************************************
-- * USB support (currently only works with D-cache off)
-- ************************************************************/
--#define CONFIG_USB_OHCI
--#define CONFIG_USB_OHCI_S3C24XX
--#define CONFIG_USB_KEYBOARD
--#define CONFIG_USB_STORAGE
--#define CONFIG_DOS_PARTITION
--
--/************************************************************
-- * RTC
-- ************************************************************/
--#define CONFIG_RTC_S3C24X0
--
--#define CONFIG_BAUDRATE		115200
--
--/*
-- * BOOTP options
-- */
--#define CONFIG_BOOTP_BOOTFILESIZE
--#define CONFIG_BOOTP_BOOTPATH
--#define CONFIG_BOOTP_GATEWAY
--#define CONFIG_BOOTP_HOSTNAME
--
--/*
-- * Command line configuration.
-- */
--#define CONFIG_CMD_BSP
--#define CONFIG_CMD_DATE
--#define CONFIG_CMD_NAND
--#define CONFIG_CMD_REGINFO
--
--#define CONFIG_CMDLINE_EDITING
--
--/* autoboot */
--#define CONFIG_BOOTDELAY	2
--#define CONFIG_BOOT_RETRY_TIME	-1
--#define CONFIG_RESET_TO_RETRY
--#define CONFIG_ZERO_BOOTDELAY_CHECK
--
--#define CONFIG_ETHADDR		11:22:33:44:55:66	
--#define CONFIG_NETMASK		255.255.255.0
--#define CONFIG_IPADDR		192.168.1.200
--#define CONFIG_SERVERIP		192.168.1.102
--
--#if defined(CONFIG_CMD_KGDB)
--#define CONFIG_KGDB_BAUDRATE	115200	/* speed to run kgdb serial port */
--#endif
--
--/*
-- * Miscellaneous configurable options
-- */
--#define CONFIG_SYS_LONGHELP		/* undef to save memory */
--#define CONFIG_SYS_CBSIZE	256
--/* Print Buffer Size */
--#define CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE + \
--				sizeof(CONFIG_SYS_PROMPT)+16)
--#define CONFIG_SYS_MAXARGS	16
--#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
--
--#define CONFIG_DISPLAY_CPUINFO				/* Display cpu info */
--
--#define CONFIG_SYS_MEMTEST_START	0x30000000	/* memtest works on */
--#define CONFIG_SYS_MEMTEST_END		0x33F00000	/* 63 MB in DRAM */
--
--#define CONFIG_SYS_LOAD_ADDR		0x30800000
--
--/* support additional compression methods */
--#define CONFIG_BZIP2
--#define CONFIG_LZO
--#define CONFIG_LZMA
--
--/*-----------------------------------------------------------------------
-- * Physical Memory Map
-- */
--#define CONFIG_NR_DRAM_BANKS	1          /* we have 1 bank of DRAM */
--#define PHYS_SDRAM_1		0x30000000 /* SDRAM Bank #1 */
--#define PHYS_SDRAM_1_SIZE	0x04000000 /* 64 MB */
--
--#define PHYS_FLASH_1		0x00000000 /* Flash Bank #0 */
--
--#define CONFIG_SYS_FLASH_BASE	PHYS_FLASH_1
--
--/*-----------------------------------------------------------------------
-- * FLASH and environment organization
-- */
--
--#define CONFIG_SYS_FLASH_CFI
--#define CONFIG_FLASH_CFI_DRIVER
--#define CONFIG_FLASH_CFI_LEGACY
--#define CONFIG_SYS_FLASH_LEGACY_512Kx16
--#define CONFIG_FLASH_SHOW_PROGRESS	45
--
--#define CONFIG_SYS_MAX_FLASH_BANKS	1
--#define CONFIG_SYS_FLASH_BANKS_LIST     { CONFIG_SYS_FLASH_BASE }
--#define CONFIG_SYS_MAX_FLASH_SECT	(19)
--
--#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + 0x070000)
--/*#define CONFIG_ENV_IS_IN_FLASH*/
--#define CONFIG_ENV_IS_IN_NAND		/*保存环境变量到NAND*/
--#define CONFIG_ENV_SIZE                 0x20000                 /*128k*/
--#define CONFIG_ENV_RANGE                CONFIG_ENV_SIZE
--#define CONFIG_ENV_OFFSET             	0x00120000      /*  after 1M+128K  */
--#define CONFIG_BOOTARGS 		"console=ttySAC0,115200 root=/dev/mtdblock4  rootfstype    =jffs2"
--#define CONFIG_BOOTCOMMAND      "nand read 30000000 kernel;bootm 30000000"
--
--/* allow to overwrite serial and ethaddr */
--#define CONFIG_ENV_OVERWRITE
--
--/*
-- * Size of malloc() pool
-- * BZIP2 / LZO / LZMA need a lot of RAM
-- */
--#define CONFIG_SYS_MALLOC_LEN	(4 * 1024 * 1024)
--
--#define CONFIG_SYS_MONITOR_LEN	(448 * 1024)
--#define CONFIG_SYS_MONITOR_BASE	CONFIG_SYS_FLASH_BASE
--
--/*
-- * NAND configuration
-- */
--#ifdef CONFIG_CMD_NAND
--#define CONFIG_NAND_S3C2440
--#define CONFIG_SYS_S3C2440_NAND_HWECC
--#define CONFIG_SYS_MAX_NAND_DEVICE	1
--#define CONFIG_SYS_NAND_BASE		0x4E000000
--#endif
--
--
--#define MTDIDS_DEFAULT          "nand0=mini2440"
--#define MTDPARTS_DEFAULT        "mtdparts=mini2440:128k(u-boot-spl)," \
--											  "1m(u-boot)," \
--                                              "128k(params)," \
--                                              "4m(kernel)," \
--                                              "-(rootfs)" 
--/*
-- * File system
-- */
--#define CONFIG_CMD_UBI
--#define CONFIG_CMD_UBIFS
--#define CONFIG_CMD_MTDPARTS
--#define CONFIG_MTD_DEVICE
--#define CONFIG_MTD_PARTITIONS
--#define CONFIG_YAFFS2
--#define CONFIG_RBTREE
--         
--/* additions for new relocation code, must be added to all boards */
--#define CONFIG_SYS_SDRAM_BASE	PHYS_SDRAM_1
--#define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_SDRAM_BASE + 0x1000 - \
--				GENERATED_GBL_DATA_SIZE)
--
--#define CONFIG_BOARD_EARLY_INIT_F
--
--#endif /* __CONFIG_H */
-diff -urN u-boot-2016.05_release/include/flash.h u-boot-2016.05_base/include/flash.h
---- u-boot-2016.05_release/include/flash.h	2017-09-17 19:48:11.894094535 +0800
-+++ u-boot-2016.05_base/include/flash.h	2016-05-16 22:40:32.000000000 +0800
-@@ -155,10 +155,10 @@
- #define ATM_MANUFACT	0x001F001F	/* ATMEL */
- #define STM_MANUFACT	0x00200020	/* STM (Thomson) manuf. ID in D23.. -"- */
- #define SST_MANUFACT	0x00BF00BF	/* SST	   manuf. ID in D23..D16, D7..D0 */
--#define MT_MANUFACT		0x00890089	/* MT	   manuf. ID in D23..D16, D7..D0 */
-+#define MT_MANUFACT	0x00890089	/* MT	   manuf. ID in D23..D16, D7..D0 */
- #define INTEL_MANUFACT	0x00890089	/* INTEL   manuf. ID in D23..D16, D7..D0 */
- #define INTEL_ALT_MANU	0x00B000B0	/* alternate INTEL namufacturer ID	*/
--#define MX_MANUFACT		0x00C200C2	/* MXIC	   manuf. ID in D23..D16, D7..D0 */
-+#define MX_MANUFACT	0x00C200C2	/* MXIC	   manuf. ID in D23..D16, D7..D0 */
- #define TOSH_MANUFACT	0x00980098	/* TOSHIBA manuf. ID in D23..D16, D7..D0 */
- #define MT2_MANUFACT	0x002C002C	/* alternate MICRON manufacturer ID*/
- #define EXCEL_MANUFACT	0x004A004A	/* Excel Semiconductor			*/
-diff -urN u-boot-2016.05_release/Kconfig u-boot-2016.05_base/Kconfig
---- u-boot-2016.05_release/Kconfig	2017-09-17 14:19:49.882050183 +0800
-+++ u-boot-2016.05_base/Kconfig	2016-05-16 22:40:32.000000000 +0800
+diff -urN u-boot-2016.05_base/drivers/mtd/nand/s3c2440_nand.c u-boot-2016.05_release/drivers/mtd/nand/s3c2440_nand.c
+--- u-boot-2016.05_base/drivers/mtd/nand/s3c2440_nand.c	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/drivers/mtd/nand/s3c2440_nand.c	2017-10-03 12:18:49.235702876 +0800
+@@ -0,0 +1,187 @@
++/*
++ * (C) Copyright 2006 OpenMoko, Inc.
++ * Author: Harald Welte <laforge@openmoko.org>
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#include <common.h>
++
++#include <nand.h>
++#include <asm/arch/s3c24x0_cpu.h>
++#include <asm/io.h>
++
++#define S3C2440_NFCONF_EN          (1<<15)
++#define S3C2440_NFCONF_512BYTE     (1<<14)
++#define S3C2440_NFCONF_4STEP       (1<<13)
++#define S3C2440_NFCONF_INITECC     (1<<12)
++#define S3C2440_NFCONF_nFCE        (1<<11)
++#define S3C2440_NFCONF_TACLS(x)    ((x)<<8)
++#define S3C2440_NFCONF_TWRPH0(x)   ((x)<<4)
++#define S3C2440_NFCONF_TWRPH1(x)   ((x)<<0)
++
++#define S3C2440_ADDR_NALE 4
++#define S3C2440_ADDR_NCLE 8
++
++#ifdef CONFIG_NAND_SPL
++
++/* in the early stage of NAND flash booting, printf() is not available */
++#define printf(fmt, args...)
++
++static void nand_read_buf(struct mtd_info *mtd, u_char *buf, int len)
++{
++	int i;
++	struct nand_chip *this = mtd->priv;
++
++	for (i = 0; i < len; i++)
++		buf[i] = readb(this->IO_ADDR_R);
++}
++#endif
++
++static void s3c24x0_hwcontrol(struct mtd_info *mtd, int cmd, unsigned int ctrl)
++{
++	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
++	if (ctrl & NAND_CLE)
++	{
++		writeb(cmd,&nand->nfcmd);
++	}
++	else if (ctrl & NAND_ALE )
++	{
++		writeb(cmd,&nand->nfaddr);
++	}
++	else
++	;
++	
++}
++
++static int s3c24x0_dev_ready(struct mtd_info *mtd)
++{
++	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
++	debug("dev_ready\n");
++	return readl(&nand->nfstat) & 0x01;
++}
++
++#ifdef CONFIG_S3C2440_NAND_HWECC
++void s3c24x0_nand_enable_hwecc(struct mtd_info *mtd, int mode)
++{
++	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
++	debug("s3c24x0_nand_enable_hwecc(%p, %d)\n", mtd, mode);
++	writel(readl(&nand->nfconf) | S3C2440_NFCONF_INITECC, &nand->nfconf);
++}
++
++static int s3c24x0_nand_calculate_ecc(struct mtd_info *mtd, const u_char *dat,
++				      u_char *ecc_code)
++{
++	struct s3c24x0_nand *nand = s3c24x0_get_base_nand();
++	ecc_code[0] = readb(&nand->nfecc);
++	ecc_code[1] = readb(&nand->nfecc + 1);
++	ecc_code[2] = readb(&nand->nfecc + 2);
++	debug("s3c24x0_nand_calculate_hwecc(%p,): 0x%02x 0x%02x 0x%02x\n",
++	      mtd , ecc_code[0], ecc_code[1], ecc_code[2]);
++
++	return 0;
++}
++
++static int s3c24x0_nand_correct_data(struct mtd_info *mtd, u_char *dat,
++				     u_char *read_ecc, u_char *calc_ecc)
++{
++	if (read_ecc[0] == calc_ecc[0] &&
++	    read_ecc[1] == calc_ecc[1] &&
++	    read_ecc[2] == calc_ecc[2])
++		return 0;
++
++	printf("s3c24x0_nand_correct_data: not implemented\n");
++	return -1;
++}
++#endif
++
++/**
++ * nand_select_chip - [DEFAULT] control CE line
++ * @mtd: MTD device structure
++ * @chipnr: chipnumber to select, -1 for deselect
++ *
++ * Default select function for 1 chip devices.
++ */
++ static void s3c24x0_nand_select(struct mtd_info *mtd, int chipnr)
++ {
++	 struct s3c24x0_nand *nand = s3c24x0_get_base_nand();                          
++	 switch (chipnr) {
++	 case -1:
++	 	nand->nfcont |= (1<<1);
++		break;
++	 case 0:
++	 	nand->nfcont &= ~(1<<1);
++		break;
++	 default:
++		 BUG();
++		 break;
++	 }
++ }
++int board_nand_init(struct nand_chip *nand)
++{
++	u_int32_t cfg;
++	u_int8_t tacls, twrph0, twrph1;
++	struct s3c24x0_clock_power *clk_power = s3c24x0_get_base_clock_power();
++	struct s3c24x0_nand *nand_reg = s3c24x0_get_base_nand();
++
++	debug("board_nand_init()\n");
++
++	writel(readl(&clk_power->clkcon) | (1 << 4), &clk_power->clkcon);
++
++	/* initialize hardware */
++#if defined(CONFIG_S3C24XX_CUSTOM_NAND_TIMING)
++	tacls  = CONFIG_S3C24XX_TACLS;
++	twrph0 = CONFIG_S3C24XX_TWRPH0;
++	twrph1 =  CONFIG_S3C24XX_TWRPH1;
++#else
++	tacls = 4;
++	twrph0 = 8;
++	twrph1 = 8;
++#endif
++/*
++	cfg = S3C2440_NFCONF_EN;
++	cfg |= S3C2440_NFCONF_TACLS(tacls - 1);
++	cfg |= S3C2440_NFCONF_TWRPH0(twrph0 - 1);
++	cfg |= S3C2440_NFCONF_TWRPH1(twrph1 - 1);
++	writel(cfg, &nand_reg->nfconf);
++*/
++	cfg = ((tacls - 1)<<12) | ((twrph0 - 1)<<8) | ((twrph1 - 1)<<4);
++   	writel(cfg, &nand_reg->nfconf);
++ 	writel((1<<4)|(1<<1)|(1<<0), &nand_reg->nfcont);
++	/* initialize nand_chip data structure */
++	nand->IO_ADDR_R = (void *)&nand_reg->nfdata;
++	nand->IO_ADDR_W = (void *)&nand_reg->nfdata;
++
++	//nand->select_chip = NULL;
++	nand->select_chip = s3c24x0_nand_select;			//修改nand片选函数指向
++	/* read_buf and write_buf are default */
++	/* read_byte and write_byte are default */
++#ifdef CONFIG_NAND_SPL
++	nand->read_buf = nand_read_buf;
++#endif
++
++	/* hwcontrol always must be implemented */
++	nand->cmd_ctrl = s3c24x0_hwcontrol;
++
++	nand->dev_ready = s3c24x0_dev_ready;
++
++#ifdef CONFIG_S3C2440_NAND_HWECC
++	nand->ecc.hwctl = s3c24x0_nand_enable_hwecc;
++	nand->ecc.calculate = s3c24x0_nand_calculate_ecc;
++	nand->ecc.correct = s3c24x0_nand_correct_data;
++	nand->ecc.mode = NAND_ECC_HW;
++	nand->ecc.size = CONFIG_SYS_NAND_ECCSIZE;
++	nand->ecc.bytes = CONFIG_SYS_NAND_ECCBYTES;
++	nand->ecc.strength = 1;
++#else
++	nand->ecc.mode = NAND_ECC_SOFT;
++#endif
++
++#ifdef CONFIG_S3C2440_NAND_BBT
++	nand->bbt_options |= NAND_BBT_USE_FLASH;
++#endif
++
++	debug("end of nand_init\n");
++
++	return 0;
++}
+\ 文件尾没有换行符
+diff -urN u-boot-2016.05_base/include/configs/mini2440.h u-boot-2016.05_release/include/configs/mini2440.h
+--- u-boot-2016.05_base/include/configs/mini2440.h	1970-01-01 08:00:00.000000000 +0800
++++ u-boot-2016.05_release/include/configs/mini2440.h	2017-10-05 10:18:37.449457519 +0800
+@@ -0,0 +1,209 @@
++/*
++ * (C) Copyright 2002
++ * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
++ * Marius Groeger <mgroeger@sysgo.de>
++ * Gary Jennejohn <garyj@denx.de>
++ * David Mueller <d.mueller@elsoft.ch>
++ *
++ * Configuation settings for the SAMSUNG SMDK2410 board.
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#ifndef __CONFIG_H
++#define __CONFIG_H
++
++/*
++ * High Level Configuration Options
++ * (easy to change)
++ */
++#define CONFIG_S3C24X0		/* This is a SAMSUNG S3C24x0-type SoC */
++#define CONFIG_S3C2440		/* specifically a SAMSUNG S3C2410 SoC */
++#define CONFIG_MINI2440		/* on a SAMSUNG SMDK2410 Board */
++
++#define CONFIG_SYS_TEXT_BASE	0x30008000
++#define CONFIG_UBOOT_LENGTH     0x100000     /*直接拷贝1M*/
++#define CONFIG_UBOOT_NAND_ADDR  0x20000   /*start of u-boot.bin in NAND*/
++
++
++#define CONFIG_SYS_ARM_CACHE_WRITETHROUGH
++
++/* input clock of PLL (the SMDK2410 has 12MHz input clock) */
++#define CONFIG_SYS_CLK_FREQ	12000000
++
++#define CONFIG_CMDLINE_TAG	/* enable passing of ATAGs */
++#define CONFIG_SETUP_MEMORY_TAGS
++#define CONFIG_INITRD_TAG
++
++/*
++ * Hardware drivers
++ */
++
++/*#define CONFIG_CS8900		*//* we have a CS8900 on-board */
++/*#define CONFIG_CS8900_BASE	0x19000300*/
++/*#define CONFIG_CS8900_BUS16	*//* the Linux driver does accesses as shorts */
++
++#define CONFIG_DRIVER_DM9000
++#define CONFIG_DM9000_BASE                       0x20000000
++#define DM9000_IO                                 CONFIG_DM9000_BASE
++#define DM9000_DATA                              (CONFIG_DM9000_BASE+4)
++/*
++ * select serial console configuration
++ */
++#define CONFIG_S3C24X0_SERIAL
++#define CONFIG_SERIAL1		1	/* we use SERIAL 1 on SMDK2410 */
++
++/************************************************************
++ * USB support (currently only works with D-cache off)
++ ************************************************************/
++#define CONFIG_USB_OHCI
++#define CONFIG_USB_OHCI_S3C24XX
++#define CONFIG_USB_KEYBOARD
++#define CONFIG_USB_STORAGE
++#define CONFIG_DOS_PARTITION
++
++/************************************************************
++ * RTC
++ ************************************************************/
++#define CONFIG_RTC_S3C24X0
++
++#define CONFIG_BAUDRATE		115200
++
++/*
++ * BOOTP options
++ */
++#define CONFIG_BOOTP_BOOTFILESIZE
++#define CONFIG_BOOTP_BOOTPATH
++#define CONFIG_BOOTP_GATEWAY
++#define CONFIG_BOOTP_HOSTNAME
++
++/*
++ * Command line configuration.
++ */
++#define CONFIG_CMD_BSP
++#define CONFIG_CMD_DATE
++#define CONFIG_CMD_NAND
++#define CONFIG_CMD_REGINFO
++
++#define CONFIG_CMDLINE_EDITING
++
++/* autoboot */
++#define CONFIG_BOOTDELAY	2
++#define CONFIG_BOOT_RETRY_TIME	-1
++#define CONFIG_RESET_TO_RETRY
++#define CONFIG_ZERO_BOOTDELAY_CHECK
++
++#define CONFIG_ETHADDR		11:22:33:44:55:66	
++#define CONFIG_NETMASK		255.255.255.0
++#define CONFIG_IPADDR		192.168.1.200
++#define CONFIG_SERVERIP		192.168.1.102
++
++#if defined(CONFIG_CMD_KGDB)
++#define CONFIG_KGDB_BAUDRATE	115200	/* speed to run kgdb serial port */
++#endif
++#define CONFIG_AUTO_COMPLETE            /*命令自动补全*/
++/*
++ * Miscellaneous configurable options
++ */
++#define CONFIG_SYS_LONGHELP		/* undef to save memory */
++#define CONFIG_SYS_CBSIZE	256
++/* Print Buffer Size */
++#define CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE + \
++				sizeof(CONFIG_SYS_PROMPT)+16)
++#define CONFIG_SYS_MAXARGS	16
++#define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
++
++#define CONFIG_DISPLAY_CPUINFO				/* Display cpu info */
++
++#define CONFIG_SYS_MEMTEST_START	0x30000000	/* memtest works on */
++#define CONFIG_SYS_MEMTEST_END		0x33F00000	/* 63 MB in DRAM */
++
++#define CONFIG_SYS_LOAD_ADDR		0x30800000
++
++/* support additional compression methods */
++#define CONFIG_BZIP2
++#define CONFIG_LZO
++#define CONFIG_LZMA
++
++/*-----------------------------------------------------------------------
++ * Physical Memory Map
++ */
++#define CONFIG_NR_DRAM_BANKS	1          /* we have 1 bank of DRAM */
++#define PHYS_SDRAM_1		0x30000000 /* SDRAM Bank #1 */
++#define PHYS_SDRAM_1_SIZE	0x04000000 /* 64 MB */
++
++#define PHYS_FLASH_1		0x00000000 /* Flash Bank #0 */
++
++#define CONFIG_SYS_FLASH_BASE	PHYS_FLASH_1
++
++/*-----------------------------------------------------------------------
++ * FLASH and environment organization
++ */
++
++#define CONFIG_SYS_FLASH_CFI
++#define CONFIG_FLASH_CFI_DRIVER
++#define CONFIG_FLASH_CFI_LEGACY
++#define CONFIG_SYS_FLASH_LEGACY_512Kx16
++#define CONFIG_FLASH_SHOW_PROGRESS	45
++
++#define CONFIG_SYS_MAX_FLASH_BANKS	1
++#define CONFIG_SYS_FLASH_BANKS_LIST     { CONFIG_SYS_FLASH_BASE }
++#define CONFIG_SYS_MAX_FLASH_SECT	(19)
++
++#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + 0x070000)
++/*#define CONFIG_ENV_IS_IN_FLASH*/
++#define CONFIG_ENV_IS_IN_NAND		/*保存环境变量到NAND*/
++#define CONFIG_ENV_SIZE                 0x20000                 /*128k*/
++#define CONFIG_ENV_RANGE                CONFIG_ENV_SIZE
++#define CONFIG_ENV_OFFSET             	0x00120000      /*  after 1M+128K  */
++#define CONFIG_BOOTARGS 		"console=ttySAC0,115200 root=/dev/mtdblock4  rootfstype    =jffs2"
++#define CONFIG_BOOTCOMMAND      "nand read 30000000 kernel;bootm 30000000"
++
++/* allow to overwrite serial and ethaddr */
++#define CONFIG_ENV_OVERWRITE
++
++/*
++ * Size of malloc() pool
++ * BZIP2 / LZO / LZMA need a lot of RAM
++ */
++#define CONFIG_SYS_MALLOC_LEN	(4 * 1024 * 1024)
++
++#define CONFIG_SYS_MONITOR_LEN	(448 * 1024)
++#define CONFIG_SYS_MONITOR_BASE	CONFIG_SYS_FLASH_BASE
++
++/*
++ * NAND configuration
++ */
++#ifdef CONFIG_CMD_NAND
++#define CONFIG_NAND_S3C2440
++#define CONFIG_SYS_S3C2440_NAND_HWECC
++#define CONFIG_SYS_MAX_NAND_DEVICE	1
++#define CONFIG_SYS_NAND_BASE		0x4E000000
++#endif
++
++
++#define MTDIDS_DEFAULT          "nand0=mini2440"
++#define MTDPARTS_DEFAULT        "mtdparts=mini2440:128k(u-boot-spl)," \
++											  "1m(u-boot)," \
++                                              "128k(params)," \
++                                              "4m(kernel)," \
++                                              "-(rootfs)" 
++/*
++ * File system
++ */
++#define CONFIG_CMD_UBI
++#define CONFIG_CMD_UBIFS
++#define CONFIG_CMD_MTDPARTS
++#define CONFIG_MTD_DEVICE
++#define CONFIG_MTD_PARTITIONS
++#define CONFIG_YAFFS2
++#define CONFIG_RBTREE
++         
++/* additions for new relocation code, must be added to all boards */
++#define CONFIG_SYS_SDRAM_BASE	PHYS_SDRAM_1
++#define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_SDRAM_BASE + 0x1000 - \
++				GENERATED_GBL_DATA_SIZE)
++
++#define CONFIG_BOARD_EARLY_INIT_F
++
++#endif /* __CONFIG_H */
+\ 文件尾没有换行符
+diff -urN u-boot-2016.05_base/Kconfig u-boot-2016.05_release/Kconfig
+--- u-boot-2016.05_base/Kconfig	2016-05-16 22:40:32.000000000 +0800
++++ u-boot-2016.05_release/Kconfig	2017-10-03 12:18:49.235702876 +0800
 @@ -103,7 +103,7 @@
  menu "Boot images"
  
  config SUPPORT_SPL
--	bool "SUPPORT_SPL"
-+	bool
+-	bool
++	bool "SUPPORT_SPL"
  
  config SUPPORT_TPL
  	bool
-diff -urN u-boot-2016.05_release/Makefile u-boot-2016.05_base/Makefile
---- u-boot-2016.05_release/Makefile	2017-09-16 23:15:06.089813593 +0800
-+++ u-boot-2016.05_base/Makefile	2016-05-16 22:40:32.000000000 +0800
-@@ -7,7 +7,7 @@
+diff -urN u-boot-2016.05_base/Makefile u-boot-2016.05_release/Makefile
+--- u-boot-2016.05_base/Makefile	2016-05-16 22:40:32.000000000 +0800
++++ u-boot-2016.05_release/Makefile	2017-10-03 12:18:49.235702876 +0800
+@@ -7,6 +7,8 @@
  SUBLEVEL =
  EXTRAVERSION =
  NAME =
--CROSS_COMPILE=/opt/arm-2014.05/bin/arm-none-linux-gnueabi-
-+
++ARCH=arm
++CROSS_COMPILE=arm-none-linux-gnueabi-
+ 
  # *DOCUMENTATION*
  # To see a list of typical targets execute "make help"
- # More info can be located in ./README
-diff -urN u-boot-2016.05_release/README.md u-boot-2016.05_base/README.md
---- u-boot-2016.05_release/README.md	2017-09-17 00:27:37.793823389 +0800
-+++ u-boot-2016.05_base/README.md	1970-01-01 08:00:00.000000000 +0800
-@@ -1,6 +0,0 @@
--u-boot-2016.05在mini2440上的移植(spl启动)
--==
--tags:mini2440 spl nandflash u-boot
------
--
--s
-\ 文件尾没有换行符
-diff -urN u-boot-2016.05_release/.vscode/settings.json u-boot-2016.05_base/.vscode/settings.json
---- u-boot-2016.05_release/.vscode/settings.json	2017-09-17 00:05:15.233820367 +0800
-+++ u-boot-2016.05_base/.vscode/settings.json	1970-01-01 08:00:00.000000000 +0800
-@@ -1,3 +0,0 @@
--{
--    "git.ignoreLimitWarning": true
--}
-\ 文件尾没有换行符
