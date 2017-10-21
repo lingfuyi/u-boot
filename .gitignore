@@ -1,6 +1,5 @@
-u-boot-2015.04
-u-boot-2016.05_base
-u-boot-2016.05_release
+u-boot-2016.05-base
+u-boot-2016.05-release
 *.png
 .vscode*
 
